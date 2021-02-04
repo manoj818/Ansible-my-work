@@ -1,0 +1,21 @@
+---
+- name: play 1- Configure Apache and Tomcat for webserver
+  hosts: xyz-com-node
+  become: yes
+  roles:
+    - apache
+
+- name: Code copy
+  hosts: xyz-com-node
+  become: yes
+  tasks:
+    - name: copy the xyz.com code
+      copy:
+        src: /etc/ansible/xyz-com/xyz.html
+        dest: /var/www/html/xyz.html
+        owner: root
+  handlers:
+    - name: reload apache
+      service:
+        name: httpd
+        state: reloaded

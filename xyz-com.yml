@@ -1,0 +1,41 @@
+---
+- name: "play 1- Configure Apache and Tomcat for webserver"
+  hosts: xyz-com-node
+  become: yes
+  roles:
+    - apache
+    - tomcat7  
+
+- name: Code copy
+  hosts: xyz-com-node
+  become: yes
+  tasks:
+    - name: copy the xyz.com code
+      copy:
+        src: /etc/ansible/xyz-com/xyz.html
+        dest: /var/www/html/xyz.html
+        owner: root
+
+- name: "play 2- Copy the code-war file to tomcat Servers"
+  hosts: xyz-com-node
+  become: yes
+  tasks:
+    - name: Download code and pate to tomcat server
+      get_url:
+        url: https://artifactorymanoj-1.s3.eu-central-1.amazonaws.com/SampleWebApp123.war
+        dest: /usr/share/tomcat/webapps  
+
+- name: "play 3 - Configure ProxyPass between Apache and Tomcat"
+  hosts: xyz-com-node
+  become: yes
+  tasks:
+    - name: copy the proxypass conf file
+      copy:
+        src: /etc/ansible/xyz-com/proxypass.conf
+        dest: /etc/httpd/conf.d/proxypass.conf
+        owner: root
+    - name: reload apache httpd, in all cases
+      service:
+        name: httpd
+        state: reloaded
+
